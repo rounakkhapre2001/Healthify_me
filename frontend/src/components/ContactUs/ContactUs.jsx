@@ -40,21 +40,27 @@ const ContactUs = () => {
       <div className="container mx-auto max-w-6xl grid md:grid-cols-2 gap-8 items-center">
         {/* Left side - Contact Details */}
         <div>
-          <h3 className="text-xl font-bold mb-4">Contact detail</h3>
+          <h3 className="text-xl font-bold mb-4">Contact Us</h3>
           <p className="text-gray-600 mb-6">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+            Have questions about your diet plan or need expert guidance? We're here to help you on your health journey.
           </p>
           <div className="mb-4">
             <p className="font-semibold">PHONE :</p>
-            <p className="text-gray-600">+12457836913, +12457836913</p>
+            <p className="font-semibold">Mon–Sat, 9:00 AM – 7:00 PM</p>
+            <p className="text-gray-600">+91 9021360459</p>
           </div>
           <div className="mb-4">
             <p className="font-semibold">EMAIL :</p>
-            <p className="text-gray-600">example@info.com</p>
+            <p className="text-gray-600">rukhminipilare24@gmail.com</p>
+          </div>
+          <div className="mb-4">
+            <p className="font-semibold">Live Chat</p>
+            <p className="text-gray-600">Talk to our team directly from the app or website.
+              Instant responses during working hours.</p>
           </div>
           <div>
             <p className="font-semibold">ADDRESS :</p>
-            <p className="text-gray-600">6743 last street, Abcd, Xyz</p>
+            <p className="text-gray-600">Nagpur, Maharashtra, India</p>
           </div>
         </div>
 
