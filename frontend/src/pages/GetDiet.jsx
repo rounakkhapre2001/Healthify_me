@@ -24,8 +24,10 @@ const GetDiet = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/get-diet-plan`, formData);
-
+      const response = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/get-diet-plan`,
+        formData
+      );
       setDietPlan(response.data);
     } catch (error) {
       console.error("Error fetching diet plan:", error);
@@ -44,58 +46,72 @@ const GetDiet = () => {
   };
 
   const downloadCompleteDoc = async () => {
-    const doc = new Document();
-    const children = [];
+    if (!dietPlan || !dietPlan.week) {
+      alert("Diet plan is not available to download.");
+      return;
+    }
 
-    children.push(
-      new Paragraph({
-        children: [new TextRun({ text: "Your Personalized Diet Plan", bold: true, size: 28, font: "Arial" })],
-        heading: "Heading1",
-      }),
-      new Paragraph({ text: " " })
-    );
-
-    Object.entries(dietPlan.week).forEach(([dayName, dayData]) => {
-      children.push(
-        new Paragraph({
-          children: [new TextRun({ text: dayName, bold: true, size: 24, font: "Arial" })],
-          spacing: { after: 200 },
-        })
-      );
-
-      dayData.meals.forEach((meal) => {
-        children.push(
-          new Paragraph({
-            children: [new TextRun({ text: `${meal.title}`, size: 22, font: "Arial" })],
-            bullet: { level: 0 },
-          })
-        );
-      });
+    try {
+      const children = [];
 
       children.push(
-        new Paragraph({ text: "" }),
         new Paragraph({
-          children: [
-            new TextRun({
-              text: `Nutrition Summary: Calories: ${Math.round(dayData.nutrients.calories)} kcal, Protein: ${Math.round(dayData.nutrients.protein)}g, Fat: ${Math.round(dayData.nutrients.fat)}g, Carbs: ${Math.round(dayData.nutrients.carbohydrates)}g`,
-              italics: true,
-              size: 20,
-              font: "Arial",
-            }),
-          ],
+          children: [new TextRun({ text: "Your Personalized Diet Plan", bold: true, size: 28, font: "Arial" })],
+          heading: "Heading1",
         }),
         new Paragraph({ text: " " })
       );
-    });
 
-    const dietDoc = new Document({ sections: [{ children }] });
-    const blob = await Packer.toBlob(dietDoc);
-    saveAs(blob, "full-diet-plan.docx");
+      Object.entries(dietPlan.week).forEach(([dayName, dayData]) => {
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: dayName, bold: true, size: 24, font: "Arial" })],
+            spacing: { after: 200 },
+          })
+        );
+
+        dayData.meals?.forEach((meal) => {
+          children.push(
+            new Paragraph({
+              children: [new TextRun({ text: `${meal.title}`, size: 22, font: "Arial" })],
+              bullet: { level: 0 },
+            })
+          );
+        });
+
+        if (dayData.nutrients) {
+          children.push(
+            new Paragraph({ text: "" }),
+            new Paragraph({
+              children: [
+                new TextRun({
+                  text: `Nutrition Summary: Calories: ${Math.round(dayData.nutrients.calories)} kcal, Protein: ${Math.round(dayData.nutrients.protein)}g, Fat: ${Math.round(dayData.nutrients.fat)}g, Carbs: ${Math.round(dayData.nutrients.carbohydrates)}g`,
+                  italics: true,
+                  size: 20,
+                  font: "Arial",
+                }),
+              ],
+            }),
+            new Paragraph({ text: " " })
+          );
+        }
+      });
+
+      const dietDoc = new Document({
+        sections: [{ children }],
+        creator: "HealthifyMe",
+      });
+
+      const blob = await Packer.toBlob(dietDoc);
+      saveAs(blob, "full-diet-plan.docx");
+    } catch (err) {
+      console.error("Failed to generate DOCX:", err);
+      alert("An error occurred while generating the DOC file.");
+    }
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden pt-24"> {/* yaha pt-24 se navbar ke neeche aaya */}
-      {/* Background Video */}
+    <div className="relative min-h-screen overflow-hidden pt-24">
       <video
         className="absolute top-0 left-0 w-full h-full object-cover z-0"
         src={bgVideo}
@@ -105,12 +121,8 @@ const GetDiet = () => {
         playsInline
       ></video>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-start min-h-screen  px-4 pt-10">
-        
-        {/* Form Section */}
+      <div className="relative z-10 flex flex-col items-center justify-start min-h-screen px-4 pt-10">
         <div className="bg-white/80 backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-md md:max-w-2xl mb-10">
-
           <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center text-black">
             Complete Your Health Profile
           </h2>
@@ -145,7 +157,6 @@ const GetDiet = () => {
           </form>
         </div>
 
-        {/* Diet Plan Section */}
         {dietPlan && dietPlan.week && (
           <div ref={pageRef} className="w-full max-w-4xl mt-20 space-y-10 bg-white p-6 sm:p-10 rounded-lg shadow-lg text-black">
             <h1 className="text-3xl sm:text-4xl font-bold mb-8 text-center">Your Personalized Diet Plan</h1>
@@ -173,7 +184,6 @@ const GetDiet = () => {
           </div>
         )}
 
-        {/* Download Buttons */}
         {dietPlan && (
           <div className="flex flex-col sm:flex-row gap-4 mt-8 mb-20">
             <button onClick={downloadCompletePNG} className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded">
